@@ -1,6 +1,6 @@
 import pytest
 from helpers.api import StellarBurgersAPI
-from helpers.data import generate_random_email, generate_random_password, generate_random_name
+from helpers.generators import generate_random_email, generate_random_password, generate_random_name
 
 
 @pytest.fixture
@@ -16,10 +16,8 @@ def registered_user(api_client):
         "name": generate_random_name()
     }
 
-    response = api_client.create_user(user_data)
-    assert response.status_code == 200
-
-    yield user_data
+    api_client.create_user(user_data)
+    return user_data
 
 
 @pytest.fixture
@@ -29,13 +27,11 @@ def auth_token(api_client, registered_user):
         "password": registered_user["password"]
     }
     response = api_client.login_user(credentials)
-    assert response.status_code == 200
     return response.json()["accessToken"]
 
 
 @pytest.fixture
 def valid_ingredients(api_client):
     response = api_client.get_ingredients()
-    assert response.status_code == 200
     ingredients = [ingredient["_id"] for ingredient in response.json()["data"]]
     return ingredients[:2]

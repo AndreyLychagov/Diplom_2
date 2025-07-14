@@ -1,5 +1,4 @@
 import allure
-import pytest
 from helpers.assertions import assert_response_status, assert_success_response, assert_error_message
 
 
@@ -31,31 +30,48 @@ class TestOrderCreation:
         assert_success_response(response)
         assert "order" in response.json()
 
-    @allure.title("Создание заказа без ингридиентов")
-    @pytest.mark.parametrize("auth_token", [pytest.param(True, id="with_auth"),
-                                            pytest.param(None, id="without_auth")])
-    def test_create_order_missing_ingredients_fail(
-            self, api_client, auth_token, registered_user
+    @allure.title("Создание заказа без ингридиентов (с авторизацией)")
+    def test_create_order_missing_ingredients_with_auth_fail(
+            self, api_client, auth_token
     ):
-        token = auth_token if isinstance(auth_token, str) else None
         response = api_client.create_order(
             ingredients=[],
-            token=token
+            token=auth_token
         )
 
         assert_response_status(response, 400)
         assert_error_message(response, "Ingredient ids must be provided")
 
-    @allure.title("Создание заказа с неверным хешем ингредиентов")
-    @pytest.mark.parametrize("auth_token", [pytest.param(True, id="with_auth"),
-                                            pytest.param(None, id="without_auth")])
-    def test_create_order_invalid_hash_fail(
-            self, api_client, auth_token, registered_user
+    @allure.title("Создание заказа без ингридиентов (без авторизации)")
+    def test_create_order_missing_ingredients_no_auth_fail(
+            self, api_client
     ):
-        token = auth_token if isinstance(auth_token, str) else None
+        response = api_client.create_order(
+            ingredients=[],
+            token=None
+        )
+
+        assert_response_status(response, 400)
+        assert_error_message(response, "Ingredient ids must be provided")
+
+    @allure.title("Создание заказа с неверным хешем ингредиентов (с авторизацией)")
+    def test_create_order_invalid_hash_with_auth_fail(
+            self, api_client, auth_token
+    ):
         response = api_client.create_order(
             ingredients=["invalid_hash_1", "invalid_hash_2"],
-            token=token
+            token=auth_token
+        )
+
+        assert_response_status(response, 500)
+
+    @allure.title("Создание заказа с неверным хешем ингредиентов (без авторизации)")
+    def test_create_order_invalid_hash_no_auth_fail(
+            self, api_client
+    ):
+        response = api_client.create_order(
+            ingredients=["invalid_hash_1", "invalid_hash_2"],
+            token=None
         )
 
         assert_response_status(response, 500)

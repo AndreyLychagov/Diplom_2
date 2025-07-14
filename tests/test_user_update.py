@@ -1,7 +1,7 @@
 import allure
 import pytest
 from helpers.assertions import assert_response_status, assert_success_response, assert_error_message
-from helpers.data import generate_random_email, generate_random_name, generate_random_password
+from helpers.generators import generate_random_email, generate_random_name, generate_random_password
 
 
 @allure.feature("Изменение данных пользователя")

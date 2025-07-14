@@ -1,7 +1,7 @@
 import allure
 import pytest
 from helpers.assertions import assert_response_status, assert_success_response, assert_error_message
-from helpers.data import generate_random_email, generate_random_password, generate_random_name
+from helpers.generators import generate_random_email, generate_random_password, generate_random_name
 
 
 @allure.feature("Создание пользователя")
